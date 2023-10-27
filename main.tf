@@ -30,6 +30,7 @@ resource "azurerm_mssql_server" "default" {
   connection_policy                            = each.value.connection_policy
   transparent_data_encryption_key_vault_key_id = each.value.transparent_data_encryption_key_vault_key_id
   minimum_tls_version                          = each.value.minimum_tls_version
+  public_network_access_enabled                = each.value.public_network_access_enabled
   outbound_network_restriction_enabled         = each.value.outbound_fqdns == null ? false : true
   primary_user_assigned_identity_id            = each.value.primary_user_assigned_identity_id
   tags                                         = local.tags
