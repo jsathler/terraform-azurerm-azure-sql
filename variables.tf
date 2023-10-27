@@ -34,7 +34,7 @@ variable "sql_server" {
     minimum_tls_version                          = optional(string, "1.2")
     allow_azure_services                         = optional(bool, false)
     public_network_access_enabled                = optional(bool, false)
-    outbound_fqdns                               = optional(list(string), [])
+    outbound_fqdns                               = optional(list(string), null)
     secondary_server_name                        = optional(string, null)
     secondary_server_resource_group_name         = optional(string, null)
     secondary_server_location                    = optional(string, "westeurope")
@@ -254,4 +254,17 @@ variable "failover_groups" {
     condition     = var.failover_groups == null ? true : alltrue([for group in var.failover_groups : length(group.database_names) <= 5])
     error_message = "Azure SQL Failover supports up to 5 DBs per group. database_names list has more than 5 DBs"
   }
+}
+
+variable "private_endpoint" {
+  type = object({
+    name                           = string
+    subnet_id                      = string
+    secondary_server_name          = optional(string, null)
+    secondary_server_subnet_id     = optional(string, null)
+    application_security_group_ids = optional(list(string))
+    private_dns_zone_id            = string
+  })
+
+  default = null
 }

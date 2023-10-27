@@ -259,3 +259,26 @@ resource "azurerm_role_assignment" "default" {
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_mssql_server.default[each.key].identity[0].principal_id
 }
+
+#######
+# Create private endpoint
+#######
+
+module "private-endpoint" {
+  for_each            = { for key, value in local.sql_servers : key => value if var.private_endpoint != null }
+  source              = "jsathler/private-endpoint/azurerm"
+  version             = "0.0.1"
+  resource_group_name = each.key == "primary" ? var.resource_group_name : each.value.secondary_server_resource_group_name
+  location            = each.key == "primary" ? var.location : each.value.secondary_server_location
+  name_sufix_append   = var.name_sufix_append
+  tags                = local.tags
+
+  private_endpoint = {
+    name                           = each.key == "primary" ? var.private_endpoint.name : var.private_endpoint.secondary_server_name
+    subnet_id                      = each.key == "primary" ? var.private_endpoint.subnet_id : var.private_endpoint.secondary_server_subnet_id
+    private_connection_resource_id = azurerm_mssql_server.default[each.key].id
+    subresource_name               = "sqlServer"
+    application_security_group_ids = var.private_endpoint.application_security_group_ids
+    private_dns_zone_id            = var.private_endpoint.private_dns_zone_id
+  }
+}
