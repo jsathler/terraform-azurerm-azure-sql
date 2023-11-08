@@ -268,7 +268,7 @@ resource "azurerm_role_assignment" "default" {
 module "private-endpoint" {
   for_each            = { for key, value in local.sql_servers : key => value if var.private_endpoint != null }
   source              = "jsathler/private-endpoint/azurerm"
-  version             = "0.0.1"
+  version             = "0.0.2"
   resource_group_name = each.key == "primary" ? var.resource_group_name : each.value.secondary_server_resource_group_name
   location            = each.key == "primary" ? var.location : each.value.secondary_server_location
   name_sufix_append   = var.name_sufix_append
